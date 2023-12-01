@@ -1,0 +1,42 @@
+#!/bin/bash
+# Define command-line arguments
+# Retrieve resource usage statistics from Kubernetes
+RESOURCE_TYPE=$1
+NAMESPACE=$2
+
+parse_field (){
+    printf '|%-10s|%-15s|%-60s|%-4s|%-4s\n' "Resource" "Namespace" "Name" "Cpu" "Memory"
+    echo "$@" | tail -n +2 | while read line
+    do
+        # Output the statistics to the console
+        if [[ $RESOURCE_TYPE == "pod" ]] && [[ -n $NAMESPACE ]]; then
+            NAME=$(echo $line | awk '{print $1}')
+            CPU=$(echo $line | awk '{print $2}')
+            MEMORY=$(echo $line | awk '{print $3}')
+            printf '|%-10s|%-15s|%-60s|%-4s|%-4s\n' "$RESOURCE_TYPE" "$NAMESPACE" "$NAME" "$CPU" "$MEMORY"
+        elif [[ $RESOURCE_TYPE == "pod" ]]; then
+            NAMESPC=$(echo $line | awk '{print $1}')
+            NAME=$(echo $line | awk '{print $2}')
+            CPU=$(echo $line | awk '{print $3}')
+            MEMORY=$(echo $line | awk '{print $4}')            
+            printf '|%-10s|%-15s|%-60s|%-4s|%-4s\n' "$RESOURCE_TYPE" "$NAMESPC" "$NAME" "$CPU" "$MEMORY"
+        elif [[ $RESOURCE_TYPE == "node" ]]; then
+            NAME=$(echo $line | awk '{print $1}')
+            CPU=$(echo $line | awk '{print $2}')
+            MEMORY=$(echo $line | awk '{print $4}')
+            printf '|%-10s|%-15s|%-60s|%-4s|%-4s\n' "$RESOURCE_TYPE" "$NAMESPACE" "$NAME" "$CPU" "$MEMORY"
+        fi
+    done
+}
+
+if [[ $RESOURCE_TYPE = "node" ]] || [[ $RESOURCE_TYPE = "pod" ]]; then
+    if [[ $RESOURCE_TYPE == "pod" ]] && [[ -n $NAMESPACE ]]; then
+        parse_field "$(kubectl top $1 --namespace $NAMESPACE)"
+    elif [[ $RESOURCE_TYPE == "pod" ]]; then
+        parse_field "$(kubectl top $1 -A)"
+    elif [[ $RESOURCE_TYPE == "node" ]]; then
+        parse_field "$(kubectl top $1)"   
+    fi
+else
+    echo "You should use "pod" or "node" resource."
+fi
