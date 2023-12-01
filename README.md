@@ -1,18 +1,18 @@
 # kubeplugins
-Bash скрипт scripts/kubectl-rusage призначений для виводу використання ресурсів в kubernetes кластері.
+Bash скрипт scripts/kubeplugin призначений для виводу використання ресурсів в kubernetes кластері.
 
 Для використання плагіну треба:
 
 1.  Виставити файлу плагіну права на виконання 
 
    ```bash
-   sudo chmod +x ./kubectl-rusage
+   sudo chmod +x ./kubeplugin
    ```
 
-2.  Помістити його, наприклад в /usr/local/bin 
+2.  Помістити його, наприклад в /usr/local/bin з наступним перейменуванням  
 
    ```bash
-   sudo cp ./kubectl-rusage /usr/local/bin 
+   sudo cp ./kubeplugin /usr/local/bin/kubectl-rusage
    ```
 
 Приклади використання:
